@@ -50,7 +50,16 @@ var Touchgui = new Phaser.Class({
 
         
         access_menu = this.add.image(630,10,'a_menu').setAlpha(1).setInteractive();
-        access_menu.on('pointerdown', function () { var menus = this.scene.get('menus'); menus.displayHideMenu(); } , this);
+        access_menu.on('pointerdown', function () 
+            {
+                this.scene.setVisible(false, 'rulez');
+                this.scene.setVisible(false, 'bugz');
+                this.scene.setVisible(false, 'about');
+                var menus = this.scene.get('menus'); 
+                menus.displayHideMenu(); 
+            } 
+
+        , this);
 
     },
 

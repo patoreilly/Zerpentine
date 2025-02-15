@@ -28,7 +28,7 @@ var config = {
     audio: {
         disableWebAudio: true
     },
-    scene: [Setup, Zerpentine, Menus, Touchgui]
+    scene: [Setup, Zerpentine, Menus, Touchgui, Rulez, Bugz, About]
 };
 
 var game = new Phaser.Game(config);
@@ -242,23 +242,23 @@ var sound_on = [
 
 
 var audioList = [
-
-'3_Days.sid',
-'Agent_of_Lies.sid',
-'Glowtones.sid',
-'Matrix_01.sid',
-'New_Blood.sid',
-'Lumina.sid',
-'GULBdata.sid',
-'Gorilla.sid',
-'One_Must_Fall_2097.sid',
-'Holocaust_Intro.sid',
-'Jamaica_10_intro.sid',
-'Methane_01.sid',
-'Long_Train_Running.sid',
-'Helikopter.sid',
-'A_True_Story.sid',
-'Eighties_Megahit.sid'
+'Ghost_Bunny.sid'
+// '3_Days.sid',
+// 'Agent_of_Lies.sid',
+// 'Glowtones.sid',
+// 'Matrix_01.sid',
+// 'New_Blood.sid',
+// 'Lumina.sid',
+// 'GULBdata.sid',
+// 'Gorilla.sid',
+// 'One_Must_Fall_2097.sid',
+// 'Holocaust_Intro.sid',
+// 'Jamaica_10_intro.sid',
+// 'Methane_01.sid',
+// 'Long_Train_Running.sid',
+// 'Helikopter.sid',
+// 'A_True_Story.sid',
+// 'Eighties_Megahit.sid'
 
 ];
 
@@ -727,3 +727,4 @@ var palette_jmp = {
     E: '#afaab9',
     F: '#f5f4eb'
 };
+

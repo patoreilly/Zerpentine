@@ -18,15 +18,24 @@ var Zerpentine = new Phaser.Class({
     {
         this.load.image('mushroom', 'sprites/mushroom.png');
         this.load.image('butterfly', 'sprites/butterfly.png');
+        this.load.image('spider', 'sprites/spider.png');
+        this.load.image('spider_violet', 'sprites/spider_violet.png');
+        this.load.image('spideregg', 'sprites/spideregg.png');
+        this.load.image('mazetiles', 'sprites/mazetiles_v1.png');
 
     },
 
     create: function ()
     {   
         
+        
         this_context = this;
 
+        
+
         //universal params
+        this.mazeWidth = 19;
+        this.mazeHeight = 10;
         this.safetile = 1;
         this.gridsize = 16;
         this.speed = 90;
@@ -34,157 +43,232 @@ var Zerpentine = new Phaser.Class({
         this.turnSpeed = 150;
         this.opposites = [ _NONE, _RIGHT, _LEFT, _DOWN, _UP ];
 
-        this.numEnemies = 12;
+        this.numEnemies = 6;
 
         this.player_dead = false;
+
+        
+
+        var nt_config1 = {
+        image: 'Nintendo',
+        width: 8,
+        height: 8,
+        chars: Phaser.GameObjects.RetroFont.TEXT_SET1,
+        charsPerRow: 96,
+        spacing: { x: 0, y: 0 },
+        lineSpacing: 8,
+        offset: {y:0}
+        };
+
+        this.cache.bitmapFont.add('bonustext', Phaser.GameObjects.RetroFont.Parse(this, nt_config1));
+
+        
+
+
         
 
         var tileSize = 16;
 
-        var tilesKey = Math.random().toString();
-        var canvasFrame = this.textures.createCanvas(tilesKey, 18*tileSize, tileSize);
+        this.mazeTilesetImage={};
+
+        var mazetilesetcanvas = Math.random().toString();
+
+        this.mazeTilesetImage.buffer = this.textures.createCanvas(mazetilesetcanvas, 18*tileSize, tileSize);
+
+        this.mazeTilesetImage.srcimg = this.textures.get('mazetiles').getSourceImage();
+
+        this.mazeTilesetImage.context = this.mazeTilesetImage.buffer.getContext('2d', {willReadFrequently:true});
+
+        var srcimg = this.mazeTilesetImage.srcimg;
+
+        this.mazeTilesetImage.context.drawImage(srcimg, 0,0,srcimg.width,srcimg.height,0,0,this.mazeTilesetImage.buffer.width, this.mazeTilesetImage.buffer.height);
+
+        var imageData = this.mazeTilesetImage.context.getImageData(0, 0, this.mazeTilesetImage.buffer.width, this.mazeTilesetImage.buffer.height);
+
+        this.mazeTilesetImage.imagedata = imageData;
+
+        this.mazeTilesetImage.pixels = imageData.data;
+
+        this.mazeTilesetImage.waveData = Phaser.Math.SinCosTableGenerator(this.mazeTilesetImage.buffer.width, 5, 5, 80);
+
+        this.mazeTilesetImage.buffer.refresh();
 
 
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: tile_wall, pixelWidth: 1 });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,0,0);
+
         
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: tile_space, pixelWidth: 1 });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize,0);
-
-
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: middle_horiz, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*2,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: left_horiz, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*3,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: right_horiz, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*4,0);
-
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: middle_verti, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*5,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: top_verti, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*6,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: bottom_verti, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*7,0);
-
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: up_t, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*8,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: down_t, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*9,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: left_t, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*10,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: right_t, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*11,0);
-
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: right_down_corner, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*12,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: left_down_corner, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*13,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: right_up_corner, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*14,0);
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: left_up_corner, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*15,0);
-
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: single_island, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*16,0);
-
-        var randomKey = Math.random().toString();
-        this.textures.generate(randomKey, { data: cross, pixelWidth: 1, palette: palette_jmp });
-        //draw the texture data for this tile
-        canvasFrame.drawFrame(randomKey,0,tileSize*17,0);
-
 
         // Creating a blank tilemap and layer with the specified dimensions
-        this.map = this.make.tilemap({ tileWidth: tileSize, tileHeight: tileSize, width: 51, height: 51});
+        this.map = this.make.tilemap({ tileWidth: tileSize, tileHeight: tileSize, width: (this.mazeWidth*2)+1, height: (this.mazeHeight*2)+1});
 
-        var tiles = this.map.addTilesetImage(tilesKey);
+
+        var tiles = this.map.addTilesetImage(mazetilesetcanvas);
 
         var layerKey = Math.random().toString();
         var layer = this.map.createBlankDynamicLayer(layerKey, tiles);
         layer.setScale(1);
 
-        this.map.setCollision([ 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 ]);
+        //this.map.setCollision([ 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 ]);
 
 
         // init animated sprites
         this.animated_group = this.add.group();
 
-        var as; 
+        var a_sprite; 
 
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest').play('atest_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest2').play('atest2_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest3').play('atest3_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest7').play('atest7_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest8').play('atest8_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest9').play('atest9_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest10').play('atest10_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest11').play('atest11_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest12').play('atest12_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest14').play('atest14_animation').setDepth(200);
-        this.animated_group.add(as);
-        as = this.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'atest17').play('atest17_animation').setDepth(200);
-        this.animated_group.add(as);
+        a_sprite = this.physics.add.sprite( 0, 0,'atest9').play('atest9_animation').setDepth(200);
+
+        a_sprite.package_sprite = this.add.sprite( 0, 0,'sploder').play('sploder_animation').setDepth(200).setVisible(true);
+
+        a_sprite.busy = true;
+
+        a_sprite.followerdata = 0;
+        a_sprite.path = new Phaser.Curves.Path(a_sprite.x, a_sprite.y);
+        //a_zsprite.path.lineTo([ 100,640 ]);
+        // a_sprite.path.splineTo([ 160,136,440,280,640,56,400,496,100,250 ]);
+        // a_sprite.path.closePath();
+
+        a_sprite.path.quadraticBezierTo(Phaser.Math.Between(100,700), Phaser.Math.Between(100,700), a_sprite.x+ Phaser.Math.Between(-100,+100)*5, a_sprite.y+ Phaser.Math.Between(-100,100)*5);
+
+        this.tweens.add({
+            targets: a_sprite,
+            followerdata: 1,
+            ease: 'none',
+            duration: 8000,
+            yoyo: 0,
+            repeat: -1,
+
+            onRepeat: function (tw,zs) { 
+
+                // console.log(tw);
+                // console.log(zs);
+                zs.followerdata=0;
+                zs.path = new Phaser.Curves.Path(zs.x, zs.y); 
+                zs.path.quadraticBezierTo(Phaser.Math.Between(100,700), Phaser.Math.Between(100,700), zs.x+ Phaser.Math.Between(-100,+100)*5, zs.y+ Phaser.Math.Between(-100,100)*5);
+                //zs.path.lineTo( Phaser.Math.Between(0,1280), Phaser.Math.Between(0,1280) ); 
+            }    
+
+            });
+
+        a_sprite.move = function()
+        {
+            this.x = this.path.getPoint(this.followerdata).x;           
+            this.y = this.path.getPoint(this.followerdata).y;
+
+            this.package_sprite.x = this.x;
+            this.package_sprite.y = this.y+16;
+        };
+
+        this.animated_group.add(a_sprite);
+
+        // next sprite
+
+        a_sprite = this.physics.add.sprite( 0, 0,'atest10').play('atest10_animation').setDepth(200);
+
+        a_sprite.package_sprite = this.add.sprite( 0, 0,'cyan_section').setDepth(200).setVisible(false);
+
+        a_sprite.busy = false;
+
+        a_sprite.followerdata = 0;
+        a_sprite.path = new Phaser.Curves.Path(a_sprite.x, a_sprite.y);
+        //a_zsprite.path.lineTo([ 100,640 ]);
+        a_sprite.path.splineTo([ 160,136,440,280,640,56 ]);
+        //a_sprite.path.closePath();
+
+        //a_zsprite.path.quadraticBezierTo(Phaser.Math.Between(320,960), Phaser.Math.Between(320,960), a_zsprite.x+ Phaser.Math.Between(-100,+100)*5, a_zsprite.y+ Phaser.Math.Between(-100,100)*5);
+
+        this.tweens.add({
+            targets: a_sprite,
+            followerdata: 1,
+            ease: 'none',
+            duration: 8000,
+            yoyo: 0,
+            repeat: -1
+
+            // onRepeat: function (tw,zs) { 
+
+            //     // console.log(tw);
+            //     // console.log(zs);
+            //     zs.followerdata=0;
+            //     zs.path = new Phaser.Curves.Path(zs.x, zs.y); 
+            //     zs.path.quadraticBezierTo(Phaser.Math.Between(320,960), Phaser.Math.Between(320,960), zs.x+ Phaser.Math.Between(-100,+100)*5, zs.y+ Phaser.Math.Between(-100,100)*5);
+            //     //zs.path.lineTo( Phaser.Math.Between(0,1280), Phaser.Math.Between(0,1280) ); 
+            // }    
+
+            });
+
+        a_sprite.move = function()
+        {
+            this.x = this.path.getPoint(this.followerdata).x;           
+            this.y = this.path.getPoint(this.followerdata).y;
+
+            this.package_sprite.x = this.x;
+            this.package_sprite.y = this.y+16;
+        };
+
+        this.animated_group.add(a_sprite);
         
         this.animated_array = this.animated_group.getChildren();
 
+        this.flea = this.animated_array[0];
+        this.winger = this.animated_array[1];
 
-        
 
 
-        // init butterfly sprites
-        this.butterfly_group = this.add.group();
+
+        // stationary objects (mushrooms,butterflies,sploders,spidereggs,skiller)
+        // create array for managing positions so no overlapping occurs, initializing it with player's starting postion
+        this.so_positions = [ { x:this.mazeWidth*16+8, y:this.mazeHeight*16-8 } ];
+
+
+        // init sploder sprites
+        this.sploder_group = this.add.group();
 
         for (var t=0;t<10;t++)
         {
-            var bf = this.physics.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'butterfly');
-            bf.zoomTo = Phaser.Math.RND.realInRange(.8, 2.4);            
+            var newPosition = this.getUnusedRandomMazePosition();
+
+            var sp = this.physics.add.sprite( newPosition.x, newPosition.y ,'sploder').play('sploder_animation');
+            this.sploder_group.add(sp);
+        }
+        this.sploder_array = this.sploder_group.getChildren();
+
+
+        // init spider killer sprites
+        this.skiller_group = this.add.group();
+
+        for (var t=0;t<1;t++)
+        {
+            var newPosition = this.getUnusedRandomMazePosition();
+
+            var sk = this.physics.add.sprite( newPosition.x, newPosition.y ,'atest11').play('atest11_animation');
+            this.skiller_group.add(sk);
+        }
+        this.skiller_array = this.skiller_group.getChildren();
+        
+
+        // init spideregg sprites
+        this.spideregg_group = this.add.group();
+
+        for (var t=0;t<10;t++)
+        {
+            var newPosition = this.getUnusedRandomMazePosition();
+
+            var se = this.physics.add.sprite( newPosition.x, newPosition.y ,'spideregg');
+            se.index = t;
+            this.spideregg_group.add(se);
+        }
+        this.spideregg_array = this.spideregg_group.getChildren();
+
+        
+        // init butterfly sprites
+        this.butterfly_group = this.add.group();
+
+        for (var t=0;t<0;t++)
+        {
+            var newPosition = this.getUnusedRandomMazePosition();
+
+            var bf = this.physics.add.sprite( newPosition.x, newPosition.y ,'butterfly');
+            bf.zoomTo = Phaser.Math.RND.realInRange(.8, 1.8);            
             this.butterfly_group.add(bf);
         }
         this.butterfly_array = this.butterfly_group.getChildren();
@@ -194,10 +278,12 @@ var Zerpentine = new Phaser.Class({
         // init mushroom sprites
         this.mushroom_group = this.add.group();
 
-        for (var t=0;t<18;t++)
+        for (var t=0;t<12;t++)
         {
-            var mush = this.physics.add.sprite( 24+(32*Phaser.Math.Between(0, 24)), 24+(32*Phaser.Math.Between(0, 24)) ,'mushroom');
-            mush.gapfactor = Phaser.Math.RND.realInRange(.25, .85);
+            var newPosition = this.getUnusedRandomMazePosition();
+
+            var mush = this.physics.add.sprite( newPosition.x, newPosition.y ,'mushroom');
+            mush.gapfactor = Phaser.Math.RND.realInRange(.15, .55);
             if (t%2 == 0)
             {
                 mush.newmaze = true;
@@ -212,34 +298,47 @@ var Zerpentine = new Phaser.Class({
         }
         this.mushroom_array = this.mushroom_group.getChildren();
 
+
+        // end stationary objects
+
+
+
+
+
         
 
         // init enemy sprite(s)
 
         this.enemy_group = this.add.group();
 
+
         for (var q=0;q<this.numEnemies;q++)
         {
             var x,y;
+            var lb = 24;                   //left maze boundary
+            var rb = this.mazeWidth*32-8;  //right maze boundary
+            var tb = 24;                   //top maze boundary
+            var bb = this.mazeHeight*32-8; //bottom maze boundary
+
             switch (q)
             {
-                case 0: x=24;y=24;break;
-                case 1: x=24;y=792;break;
-                case 2: x=792;y=24;break;
-                case 3: x=792;y=792;break;
-                case 4: x=24;y=24;break;
-                case 5: x=24;y=792;break;
-                case 6: x=792;y=24;break;
-                case 7: x=792;y=792;break;
-                case 8: x=24;y=24;break;
-                case 9: x=24;y=792;break;
-                case 10: x=792;y=24;break;
-                case 11: x=792;y=792;break;
+                case 0: x=lb;y=tb;break;
+                case 1: x=lb;y=bb;break;
+                case 2: x=rb;y=tb;break;
+                case 3: x=rb;y=bb;break;
+                case 4: x=lb;y=tb;break;
+                case 5: x=lb;y=bb;break;
+                case 6: x=rb;y=tb;break;
+                case 7: x=rb;y=bb;break;
+                case 8: x=lb;y=tb;break;
+                case 9: x=lb;y=bb;break;
+                case 10: x=rb;y=tb;break;
+                case 11: x=rb;y=bb;break;
             }
-            var enemy = this.physics.add.sprite(x,y,'red_head').setDepth(100);
+            var enemy = this.physics.add.sprite(x,y,'red_head').setDepth(100).setAngle(90);
             
             enemy.eindex = q;
-
+            enemy.type = 'snake';
             enemy.snakeSection = [];
             enemy.snakePath = [];
             enemy.speed = Phaser.Math.RND.realInRange(1.2, 2.2);
@@ -277,21 +376,23 @@ var Zerpentine = new Phaser.Class({
 
             this.enemy_group.add(enemy);
         }
+
+
         this.enemy_array = this.enemy_group.getChildren();
 
 
         //demobot
 
-        demobot = this.physics.add.sprite(-100,-100,'blue_head').setDepth(100).setVisible(false);
+        demobot = this.physics.add.sprite(-100,-100,'cyan_head').setDepth(100).setAngle(90).setVisible(false);
             
         demobot.eindex = q;
-
+        demobot.type = 'snake';
         demobot.snakeSection = [];
         demobot.snakePath = [];
         demobot.speed = 1.8;
         demobot.snakeSpacer = Math.round((3/demobot.speed)*5);
 
-        demobot.numSnakeSections = 8;
+        demobot.numSnakeSections = 4;
 
         //demobot.status='red';
 
@@ -313,9 +414,9 @@ var Zerpentine = new Phaser.Class({
         //  Init player snakeSection array
         for (var i = 0; i < demobot.numSnakeSections; i++)
         {
-            demobot.snakeSection[i] = this.physics.add.sprite(demobot.x-(i+1)*demobot.snakeSpacer, demobot.y, 'blue_section').setDepth(99-i).setVisible(false); 
+            demobot.snakeSection[i] = this.physics.add.sprite(demobot.x-(i+1)*demobot.snakeSpacer, demobot.y, 'cyan_section').setDepth(99-i).setVisible(false); 
             demobot.snakeSection[i].eindex = q;
-            //demobot.body_group.add(demobot.snakeSection[i]);
+            demobot.snakeSection[i].type = 'normal';
         }            
         //  Init player snakePath array
         for (var i = 0; i < (demobot.numSnakeSections+1) * demobot.snakeSpacer; i++)
@@ -346,7 +447,7 @@ var Zerpentine = new Phaser.Class({
 
         // init player sprite(s)
 
-        player = this.physics.add.sprite(-100,-100,'blue_head').setDepth(100).setVisible(false);
+        player = this.physics.add.sprite(-100,-100,'cyan_head').setDepth(100).setVisible(false);
 
         player.sametile = true;
         player.marker = {};
@@ -358,15 +459,15 @@ var Zerpentine = new Phaser.Class({
         player.speed = 2.0;//1.5;
         player.snakeSpacer = Math.round((3/player.speed)*5);
 
-        player.numSnakeSections = 9;
+        player.numSnakeSections = 4;
 
         //player.body_group = this.add.group();
 
         
         for (var i = 0; i < player.numSnakeSections; i++)
         {
-            player.snakeSection[i] = this.physics.add.sprite(player.x-(i+1)*player.snakeSpacer, player.y, 'blue_section').setDepth(99-i).setVisible(false);
-            //player.body_group.add(player.snakeSection[i]);          
+            player.snakeSection[i] = this.physics.add.sprite(player.x-(i+1)*player.snakeSpacer, player.y, 'cyan_section').setDepth(99-i).setVisible(false);
+            player.snakeSection[i].type = 'normal';          
         }
         
         //  Init player snakePath array
@@ -379,8 +480,8 @@ var Zerpentine = new Phaser.Class({
         //maze generation
         
 
-        this.mainMaze = this.generateMaze(25,25);
-        this.displayMaze(this.mainMaze, .25);
+        this.mainMaze = this.generateMaze(this.mazeWidth,this.mazeHeight);
+        this.displayMaze(this.mainMaze, 0.0);
 
 
         
@@ -417,9 +518,17 @@ var Zerpentine = new Phaser.Class({
 
         
 
+        // collisions - enemy snakes vs spidereggs
+        for (var y=0;y<this.enemy_array.length;y++)
+        {
+            if (this.enemy_array[y].type == 'snake') { this.physics.add.overlap(this.enemy_array[y], this.spideregg_group, this.do_spideregg); }
+        }
         
 
         // collisions - player
+        this.physics.add.overlap(player, this.skiller_group, this.do_skiller);
+        this.physics.add.overlap(player, this.sploder_group, this.do_sploder);
+        this.physics.add.overlap(player, this.spideregg_group, this.do_spideregg);
         this.physics.add.overlap(player, this.mushroom_group, this.do_mush);
         this.physics.add.overlap(player, this.butterfly_group, this.do_bf);
 
@@ -428,15 +537,18 @@ var Zerpentine = new Phaser.Class({
 
         for (var y=0;y<this.enemy_array.length;y++)
         {
-            this.physics.add.overlap(player, this.enemy_array[y].snakeSection, this.p2ebody_collision); 
+            if (this.enemy_array[y].type == 'snake') { this.physics.add.overlap(player, this.enemy_array[y].snakeSection, this.p2ebody_collision); }
         }
 
-        for (var y=0;y<this.enemy_array.length;y++)
-        {
-            this.physics.add.overlap(this.enemy_group, player.snakeSection, this.e2pbody_collision); 
-        }
+        this.physics.add.overlap(this.enemy_group, player.snakeSection, this.e2pbody_collision); 
+
+        this.physics.add.overlap(this.winger, player.snakeSection, this.winger_collision);
+        
 
         // collisions - demobot
+        this.physics.add.overlap(demobot, this.skiller_group, this.do_skiller);
+        this.physics.add.overlap(demobot, this.sploder_group, this.do_sploder);
+        this.physics.add.overlap(demobot, this.spideregg_group, this.do_spideregg);
         this.physics.add.overlap(demobot, this.mushroom_group, this.do_mush);
         this.physics.add.overlap(demobot, this.butterfly_group, this.do_bf);
 
@@ -445,13 +557,13 @@ var Zerpentine = new Phaser.Class({
 
         for (var y=0;y<this.enemy_array.length;y++)
         {
-            this.physics.add.overlap(demobot, this.enemy_array[y].snakeSection, this.p2ebody_collision); 
+            if (this.enemy_array[y].type == 'snake') { this.physics.add.overlap(demobot, this.enemy_array[y].snakeSection, this.p2ebody_collision); }
         }
 
-        for (var y=0;y<this.enemy_array.length;y++)
-        {
-            this.physics.add.overlap(this.enemy_group, demobot.snakeSection, this.e2dbody_collision); 
-        }
+        this.physics.add.overlap(this.enemy_group, demobot.snakeSection, this.e2pbody_collision); 
+
+        this.physics.add.overlap(this.winger, demobot.snakeSection, this.winger_collision); 
+        
 
 
 
@@ -500,8 +612,8 @@ var Zerpentine = new Phaser.Class({
 
         if (demo_mode)
         {
-            demobot.x = 376;
-            demobot.y = 376;
+            demobot.x = this.mazeWidth*16+8;
+            demobot.y = this.mazeHeight*16-8;
             demobot.visible = true;
             for (var i = 0; i < demobot.numSnakeSections; i++)
             {
@@ -509,13 +621,14 @@ var Zerpentine = new Phaser.Class({
                 demobot.snakeSection[i].y = demobot.y;
                 demobot.snakeSection[i].setVisible(true);             
             }
-            myCam.startFollow(demobot, true);
+            myCam.centerOn(demobot.x,demobot.y);
+            //myCam.startFollow(demobot, true);
         }
         else
         {
 
-            player.x = 376;
-            player.y = 376;
+            player.x = this.mazeWidth*16+8;
+            player.y = this.mazeHeight*16-8;
             player.visible = true
             for (var i = 0; i < player.numSnakeSections; i++)
             {
@@ -523,10 +636,16 @@ var Zerpentine = new Phaser.Class({
                 player.snakeSection[i].y = player.y;
                 player.snakeSection[i].setVisible(true);             
             }
-
-            myCam.startFollow(player, true);
+            myCam.centerOn(player.x,player.y);
+            //myCam.startFollow(player, true);
         }
         
+        //myCam.zoomTo(.5);
+
+
+
+
+
 
 
         //this.cameras.main.setZoom(1);
@@ -554,55 +673,196 @@ var Zerpentine = new Phaser.Class({
 
     },
 
-    e2dbody_collision: function(sprite1,sprite2)
+
+    getUnusedRandomMazePosition: function()
     {
-        var ssi = demobot.snakeSection.findIndex(function(e){return (e == sprite2)});
+        var randomX = 24+(32*Phaser.Math.Between(0, this.mazeWidth-1));
+        var randomY = 24+(32*Phaser.Math.Between(0, this.mazeHeight-1));
+        var newPosition = {x:randomX, y:randomY};
 
-        for (var i=ssi;i<demobot.numSnakeSections;i++)
+        var positionExists = this.so_positions.find( 
+            function checkForPosition(value,index,array) 
+                {
+                    return (value.x==newPosition.x && value.y==newPosition.y)
+                } 
+            );
+
+        if (positionExists==undefined)
         {
-            demobot.snakeSection[i].setVisible(false);
-            var x=demobot.snakeSection[i].x;
-            var y=demobot.snakeSection[i].y;
-            this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
-            
-            demobot.snakeSection[i].destroy();            
+            this.so_positions.push(newPosition);
+            return newPosition;
         }
+        else
+        {
+            return this.getUnusedRandomMazePosition();
+        }
+    },
 
-        var truncateSections = demobot.numSnakeSections-ssi;
 
-        demobot.snakeSection.splice(ssi,truncateSections);
-        demobot.numSnakeSections = demobot.numSnakeSections-truncateSections;
-        demobot.snakePath.splice( demobot.numSnakeSections*demobot.snakeSpacer, truncateSections*demobot.snakeSpacer );
+    explosion_callback: function(anim,frame,sprite)
+    {
+        sprite.destroy(true);
+    },
 
-        if (demobot.numSnakeSections==0) this_context.player_dead = true;
+    explosion_collision: function(sprite1,sprite2)
+    {
+        if (sprite1.type=='snake')
+            {
+                for (var i=0;i<sprite1.numSnakeSections;i++)
+                {
+                    sprite1.snakeSection[i].setVisible(false);
+                    var x=sprite1.snakeSection[i].x;
+                    var y=sprite1.snakeSection[i].y;
+                    
+                    if (sprite1.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+                    else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
 
-        this_context.update_enemy_colors(demobot);
-    }, 
+                    sprite1.snakeSection[i].destroy(); 
+                }
+                sprite1.setVisible(false);
+                var x=sprite1.x;
+                var y=sprite1.y;
+                
+                if (sprite1.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+                else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
+
+                sprite1.destroy(true);
+            }
+            else
+            {
+                sprite1.setVisible(false);
+                var x=sprite1.x;
+                var y=sprite1.y;
+                this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
+                sprite1.destroy(true);
+
+                var bonus = this_context.add.dynamicBitmapText(0, 0, 'bonustext', "100").setOrigin(.5).setScale(2).setCenterAlign().setPosition(x,y).setDepth(200);
+                this_context.tweens.add({targets: bonus, y: y-35, alpha: 0, ease: 'Sine.easeOut', duration: 400});
+            }
+    },
+
+    winger_collision: function(sprite1,sprite2)
+    {
+        var player_or_demobot = demo_mode==false ? player:demobot;
+
+        if (!sprite1.busy)
+        {
+            sprite1.busy = true;
+
+            var last_ssi = player_or_demobot.numSnakeSections-1;
+
+            // // check for sploder section
+            // if (player_or_demobot.snakeSection[ssi].type=='sploder')
+            // {            
+            //     // draw a sploder sprite under the winger
+            // }
+            // else
+            // {
+
+                // draw a body section sprite under the winger
+                sprite1.package_sprite.visible = true;
+
+            // }            
+                
+            player_or_demobot.snakeSection[last_ssi].destroy();            
+
+            var truncateSections = 1;
+
+            player_or_demobot.snakeSection.splice(last_ssi,last_ssi);
+            player_or_demobot.numSnakeSections = player_or_demobot.numSnakeSections-truncateSections;
+            player_or_demobot.snakePath.splice( player_or_demobot.numSnakeSections*player_or_demobot.snakeSpacer, truncateSections*player_or_demobot.snakeSpacer );
+
+            if (player_or_demobot.numSnakeSections==0) this_context.player_dead = true;
+
+            this_context.update_enemy_colors(player_or_demobot);
+        }
+        
+
+        
+    },
+
+
 
 
     e2pbody_collision: function(sprite1,sprite2)
     {
-        var ssi = player.snakeSection.findIndex(function(e){return (e == sprite2)});
+        var player_or_demobot = demo_mode==false ? player:demobot;
 
-        for (var i=ssi;i<player.numSnakeSections;i++)
+        var ssi = player_or_demobot.snakeSection.findIndex(function(e){return (e == sprite2)});
+
+        // check for sploder section and destroy attacking enemy if true
+        if (player_or_demobot.snakeSection[ssi].type=='sploder')
         {
-            player.snakeSection[i].setVisible(false);
-            var x=player.snakeSection[i].x;
-            var y=player.snakeSection[i].y;
-            this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
+            if (sprite1.type=='snake')
+            {
+                for (var i=0;i<sprite1.numSnakeSections;i++)
+                {
+                    sprite1.snakeSection[i].setVisible(false);
+                    var x=sprite1.snakeSection[i].x;
+                    var y=sprite1.snakeSection[i].y;
+                    
+                    if (sprite1.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+                    else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
+
+                    sprite1.snakeSection[i].destroy(); 
+                }
+                sprite1.setVisible(false);
+                var x=sprite1.x;
+                var y=sprite1.y;
+                
+                if (sprite1.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+                else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
+
+                sprite1.destroy(true);
+            }
+            else
+            {
+
+                sprite1.setVisible(false);
+                var x=sprite1.x;
+                var y=sprite1.y;
+                this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
+                sprite1.destroy(true);
+
+                var bonus = this_context.add.dynamicBitmapText(0, 0, 'bonustext', "100").setOrigin(.5).setScale(2).setCenterAlign().setPosition(x,y).setDepth(200);
+                this_context.tweens.add({targets: bonus, y: y-35, alpha: 0, ease: 'Sine.easeOut', duration: 400});
+            }
             
-            player.snakeSection[i].destroy();            
+        }
+        // end check for sploder
+
+        for (var i=ssi;i<player_or_demobot.numSnakeSections;i++)
+        {
+            player_or_demobot.snakeSection[i].setVisible(false);
+            var x=player_or_demobot.snakeSection[i].x;
+            var y=player_or_demobot.snakeSection[i].y;
+
+            if (player_or_demobot.snakeSection[i].type=='normal')
+            {
+                this_context.add.sprite(x, y,'cyan_pop').play('cyan_pop_animation').setDepth(200);
+            }
+            else
+            {
+                var new_explosion = this_context.physics.add.sprite(x, y,'purple_explosion').play('purple_explosion_animation').setDepth(200);
+                this_context.physics.add.overlap(this_context.enemy_group, new_explosion, this_context.explosion_collision);
+                new_explosion.on('animationcomplete', this_context.explosion_callback, this_context);
+            }
+            
+            
+            player_or_demobot.snakeSection[i].destroy();            
         }
 
-        var truncateSections = player.numSnakeSections-ssi;
+        var truncateSections = player_or_demobot.numSnakeSections-ssi;
 
-        player.snakeSection.splice(ssi,truncateSections);
-        player.numSnakeSections = player.numSnakeSections-truncateSections;
-        player.snakePath.splice( player.numSnakeSections*player.snakeSpacer, truncateSections*player.snakeSpacer );
+        player_or_demobot.snakeSection.splice(ssi,truncateSections);
+        player_or_demobot.numSnakeSections = player_or_demobot.numSnakeSections-truncateSections;
+        player_or_demobot.snakePath.splice( player_or_demobot.numSnakeSections*player_or_demobot.snakeSpacer, truncateSections*player_or_demobot.snakeSpacer );
 
-        if (player.numSnakeSections==0) this_context.player_dead = true;
+        if (player_or_demobot.numSnakeSections==0) this_context.player_dead = true;
 
-        this_context.update_enemy_colors(player);
+        this_context.update_enemy_colors(player_or_demobot);
+
+        
     },     
 
     p2ehead_collision: function(sprite1,sprite2)
@@ -629,23 +889,34 @@ var Zerpentine = new Phaser.Class({
         }
         else
         {
-            for (var i=0;i<sprite1.numSnakeSections;i++)
+            if (sprite2.type=='spider' && sprite2.status=='violet')
             {
-                sprite1.snakeSection[i].setVisible(false);
-                var x=sprite1.snakeSection[i].x;
-                var y=sprite1.snakeSection[i].y;
+                sprite2.setVisible(false);
+                var x=sprite2.x;
+                var y=sprite2.y;
                 this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
-
-                sprite1.snakeSection[i].destroy(); 
+                sprite2.destroy(true);
             }
-            sprite1.setVisible(false);
-            var x=sprite1.x;
-            var y=sprite1.y;
-            this_context.add.sprite(x, y,'blue_pop').play('blue_pop_animation').setDepth(200);
+            else
+            {
+                for (var i=0;i<sprite1.numSnakeSections;i++)
+                {
+                    sprite1.snakeSection[i].setVisible(false);
+                    var x=sprite1.snakeSection[i].x;
+                    var y=sprite1.snakeSection[i].y;
+                    this_context.add.sprite(x, y,'cyan_pop').play('cyan_pop_animation').setDepth(200);
 
-            sprite1.numSnakeSections=0;
+                    sprite1.snakeSection[i].destroy(); 
+                }
+                sprite1.setVisible(false);
+                var x=sprite1.x;
+                var y=sprite1.y;
+                this_context.add.sprite(x, y,'cyan_pop').play('cyan_pop_animation').setDepth(200);
 
-            this_context.player_dead = true;   
+                sprite1.numSnakeSections=0;
+
+                this_context.player_dead = true;   
+            }
         }
     },
 
@@ -683,8 +954,167 @@ var Zerpentine = new Phaser.Class({
         this_context.update_enemy_colors(sprite1);
     },
 
+    s2ehead_collision: function(sprite1,sprite2)
+    {
+        for (var i=0;i<sprite2.numSnakeSections;i++)
+        {
+            sprite2.snakeSection[i].setVisible(false);
+            var x=sprite2.snakeSection[i].x;
+            var y=sprite2.snakeSection[i].y;
+            //this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+            if (sprite2.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+            else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
 
+            sprite2.snakeSection[i].destroy(); 
+        }
+        sprite2.setVisible(false);
+        var x=sprite2.x;
+        var y=sprite2.y;
+        //this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+        if (sprite2.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+        else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
 
+        sprite2.destroy(true);
+
+        
+    },
+
+    s2ebody_collision: function(sprite1,sprite2)
+    {
+        var ei = this_context.enemy_array.findIndex(function(e){return (e.eindex == sprite2.eindex)});
+        var thisEnemy = this_context.enemy_array[ei];
+        var ssi = thisEnemy.snakeSection.findIndex(function(e){return (e == sprite2)});
+
+        for (var i=ssi;i<thisEnemy.numSnakeSections;i++)
+        {
+            thisEnemy.snakeSection[i].setVisible(false);
+            var x=thisEnemy.snakeSection[i].x;
+            var y=thisEnemy.snakeSection[i].y;
+            if (thisEnemy.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+            else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
+
+            thisEnemy.snakeSection[i].destroy(); 
+        }
+        
+        thisEnemy.numSnakeSections = thisEnemy.numSnakeSections-(thisEnemy.numSnakeSections-ssi);
+
+        if (thisEnemy.numSnakeSections==0) 
+        {
+            thisEnemy.setVisible(false);
+            var x=thisEnemy.x;
+            var y=thisEnemy.y;
+            if (thisEnemy.status !='red') this_context.add.sprite(x, y,'green_pop').play('green_pop_animation').setDepth(200);
+            else this_context.add.sprite(x, y,'red_pop').play('red_pop_animation').setDepth(200);
+
+            thisEnemy.destroy();
+            
+        }
+        
+        if (demo_mode) this_context.update_enemy_colors(demobot);
+        else this_context.update_enemy_colors(player);
+
+    },
+
+    do_skiller: function(sprite1, sprite2)
+    {
+        for (var y=0;y<this_context.enemy_array.length;y++)
+        {
+            if (this_context.enemy_array[y].type == 'spider') 
+            { 
+                this_context.enemy_array[y].setTexture('spider_violet');
+                this_context.enemy_array[y].status = 'violet';
+            }
+
+        }
+    },
+
+    do_sploder: function(sprite1, sprite2)
+    {
+        sprite1.numSnakeSections++;
+
+        //re-init sprite snakePath array
+        for (var i = (sprite1.numSnakeSections) * sprite1.snakeSpacer; i < (sprite1.numSnakeSections+1) * sprite1.snakeSpacer; i++)
+        {
+            sprite1.snakePath[i] = {x:0, y:0, angle:0};
+        }
+
+        var thisSection = this_context.physics.add.sprite(-100, -100, 'sploder').setDepth(100-sprite1.numSnakeSections).play('sploder_animation');
+
+        thisSection.type = 'sploder';
+
+        sprite1.snakeSection.push(thisSection);         
+
+        this_context.update_enemy_colors(sprite1);
+
+        sprite2.destroy();
+    },
+
+    do_spideregg: function(sprite1,sprite2)
+    {
+        sprite2.visible=false;
+
+        var spawnsprite = this_context.add.sprite( sprite2.x, sprite2.y ,'atest3').play('atest3_animation').setDepth(200);
+        spawnsprite.on('animationcomplete', this_context.initSpider, this_context);
+
+        // this_context.newspiderX = sprite2.x;
+        // this_context.newspiderY = sprite2.y;
+        // this_context.spawnanimation = spawnanimation;
+        
+        sprite2.destroy();
+
+        // enemy.type = 'spider';
+        // enemy.speed = Phaser.Math.RND.realInRange(1.2, 2.2);
+        // enemy.emarker = {};
+        // enemy.turnPoint = {};
+        // enemy.directions = [ null, null, null, null, null ];
+        // enemy.current = _DOWN;
+        // enemy.turning = _NONE;
+        // enemy.AI_turnTo = _NONE;
+        // enemy.saved_emarker = {x:1,y:8};
+        // enemy.safe_tile_list = [];
+        // enemy.newFlag = false;
+
+        //this.enemy_group.add(enemy);
+    },
+
+    initSpider: function(anim,frame,spawnsprite)
+    {
+        var enemy = this.physics.add.sprite(spawnsprite.x, spawnsprite.y, 'spider').setDepth(100).setAngle(90);
+        spawnsprite.destroy();
+
+        enemy.type = 'spider';
+        enemy.status = 'blue';
+        enemy.speed = Phaser.Math.RND.realInRange(1.2, 2.2);
+        enemy.emarker = {};
+        enemy.turnPoint = {};
+        enemy.directions = [ null, null, null, null, null ];
+        enemy.current = _DOWN;
+        enemy.turning = _NONE;
+        enemy.AI_turnTo = _NONE;
+        enemy.saved_emarker = {x:1,y:8};
+        enemy.safe_tile_list = [];
+        enemy.newFlag = false;
+
+        // init spider collisions to enemy snakes
+        for (var y=0;y<this.enemy_array.length;y++)
+        {
+            if (this.enemy_array[y].type == 'snake') 
+                { 
+                    this.physics.add.overlap(enemy, this.enemy_array[y], this.s2ehead_collision);
+                    this.physics.add.overlap(enemy, this.enemy_array[y].snakeSection, this.s2ebody_collision); 
+                }
+        }
+
+        if (!demo_mode)
+        {
+            this.enemy_group.add(enemy);
+        }
+        else
+        {
+            this.enemy_group.add(enemy);
+            this.demo_group.add(enemy);
+        }
+    },
 
     do_bf: function(sprite1,sprite2)
     {
@@ -693,11 +1123,8 @@ var Zerpentine = new Phaser.Class({
 
     do_mush: function(sprite1,sprite2)
     {
-        
-
         if (sprite1.saved_marker.x !== sprite1.marker.x || sprite1.saved_marker.y !== sprite1.marker.y)
         {
-            
             sprite1.saved_marker.x = sprite1.marker.x;
             sprite1.saved_marker.y = sprite1.marker.y;
 
@@ -708,7 +1135,6 @@ var Zerpentine = new Phaser.Class({
             {
                 sprite1.sametile = false;
             }
-     
         }
         else
         {
@@ -719,19 +1145,33 @@ var Zerpentine = new Phaser.Class({
         {
             if (sprite2.newmaze)
             {
-                this_context.displayMaze(this_context.generateMaze(25,25), sprite2.gapfactor);
+                this_context.displayMaze(this_context.generateMaze(this_context.mazeWidth,this_context.mazeHeight), sprite2.gapfactor);
             }
             else
             {
                 this_context.displayMaze(this_context.mainMaze, sprite2.gapfactor);
             }
+
+            this_context.time.addEvent({ delay: 0, callback: this_context.wave, callbackScope: this_context, repeat: 10 });
+            this_context.time.addEvent({ delay: 0, callback: this_context.noise, callbackScope: this_context, repeat: 10 });
+            this_context.time.addEvent({ delay: 200, callback: this_context.resetmazeimage, callbackScope: this_context, repeat: 0 });
         }
     },
 
-    
-    update: function()
+    resetmazeimage: function()
     {
 
+        thing = this.mazeTilesetImage;
+
+        // reset context to original, unaltered image data
+        thing.context.clearRect(0,0,thing.buffer.width,thing.buffer.height);
+        thing.context.drawImage(thing.srcimg, 0,0,thing.srcimg.width,thing.srcimg.height,0,0,thing.buffer.width, thing.buffer.height);
+        thing.buffer.refresh();
+    },
+    
+    update: function(time)
+    {
+        // player, demobot, enemies
 
         if (!this.player_dead)
         {
@@ -759,8 +1199,20 @@ var Zerpentine = new Phaser.Class({
         {
             this.newPlay();
         }
+
+
+
             
-            
+        // animated sprites
+
+        this.animated_group.children.iterate( 
+
+            function(_sprite)
+            { 
+                _sprite.move() 
+            } 
+
+        );
                 
 
     },
@@ -772,8 +1224,116 @@ var Zerpentine = new Phaser.Class({
         this.scene.restart();
     },
 
+    wave: function()
+    {
+
+        var thing = this.mazeTilesetImage;
+
+        // reset context to original, unaltered image data
+        thing.context.clearRect(0,0,thing.buffer.width,thing.buffer.height);
+        thing.context.drawImage(thing.srcimg, 0,0,thing.srcimg.width,thing.srcimg.height,0,0,thing.buffer.width, thing.buffer.height);
+       
 
 
+        numberOfFrames = thing.buffer.width;
+        wavePixelChunk = 1;
+        
+        // retrieve the unaltered image data and pixels                 
+        var imageData = thing.context.getImageData(0, 0, thing.buffer.width, thing.buffer.height);
+        var savedpixels = imageData.data;
+
+        // width is number of frames, 1 frame for every col
+        for (var x = 0; x <numberOfFrames ; x += wavePixelChunk)
+        {
+            
+                
+            
+                
+
+            var y = thing.waveData.sin[x];
+
+            for (var sy=0; sy<thing.buffer.height; sy++)  
+            {   
+                var bytesPerPixel=4; 
+
+                var sourceIndex=(bytesPerPixel*x) + (thing.buffer.width*bytesPerPixel)*sy;
+
+                var red=savedpixels[sourceIndex];
+                var green=savedpixels[sourceIndex+1];
+                var blue=savedpixels[sourceIndex+2];
+                var alpha=savedpixels[sourceIndex+3];
+
+                var yadj = Math.round(y)+sy;
+                var targetIndex= (bytesPerPixel*x) + (thing.buffer.width*bytesPerPixel)*yadj;
+
+                thing.pixels[targetIndex]=red; 
+                thing.pixels[targetIndex+1]=green;   
+                thing.pixels[targetIndex+2]=blue;   
+                thing.pixels[targetIndex+3]=alpha;         
+            }                     
+        }
+            
+        //  Cycle through the wave data - this is what causes the image to "undulate"
+        Phaser.Utils.Array.RotateRight(thing.waveData.sin);
+    
+        // this.waveFrameIndex+=this.wavePixelChunk;
+    
+        // if (this.waveFrameIndex>=this.numberOfFrames) 
+        // {
+        //     this.waveFrameIndex = 0; 
+        //     this.scrollcycles++;
+        //     if (this.scrollcycles==1) { this.scrollcycles=0 } //this.wallAnimatedData.modedoneflag='true';
+            
+        // }
+
+
+        thing.buffer.getContext('2d', {willReadFrequently:true}).putImageData(thing.imagedata,0,0);
+            thing.buffer.refresh();
+    },
+
+    noise: function()
+    {
+        var thing = this.mazeTilesetImage;
+        
+        var colors = ['blue','red','orange','green','cyan','violet'];
+        var color = colors[Phaser.Math.Between(0,colors.length-1)];
+
+        var r,g,b;
+
+        if (color=='red') { r=255; g=0; b=0; }
+        if (color=='green') { r=0; g=255; b=0; }
+        if (color=='blue') { r=0; g=0; b=255; }
+        if (color=='orange') { r=255; g=255; b=0; }
+        if (color=='cyan') { r=0; g=255; b=255; }
+        if (color=='violet') { r=255; g=0; b=255; }
+        if (color=='white') { r=255; g=255; b=255; }
+        if (color=='black') { r=0; g=0; b=0; }
+
+        //copy pixels
+        for (var x=0; x<thing.buffer.width; x++)
+        {            
+            for (var y=0; y<thing.buffer.height; y++)
+            {
+                var bytesPerPixel=4;
+                var targetIndex=(thing.buffer.width*bytesPerPixel)*y+(bytesPerPixel*x);          
+                // var red = this.wall[i].pixels[targetIndex];
+                // var green = this.wall[i].pixels[targetIndex+1];
+                // var blue = this.wall[i].pixels[targetIndex+2];
+                var alpha = thing.pixels[targetIndex+3];
+            
+                if (alpha!=0)
+                {
+                    var greylev = Phaser.Math.Between(80,160);
+                    thing.pixels[targetIndex]=greylev*r/255;
+                    thing.pixels[targetIndex+1]=greylev*g/255;
+                    thing.pixels[targetIndex+2]=greylev*b/255;
+                }                
+            }            
+        }
+
+        thing.buffer.getContext('2d', {willReadFrequently:true}).putImageData(thing.imagedata,0,0);
+            thing.buffer.refresh();
+    },
 
 
 
@@ -836,10 +1396,10 @@ var Zerpentine = new Phaser.Class({
                             }
 
                             //// if needed to reset body from wall
-                            else
-                            {
-                                player.body.x=player.directions[1].pixelX+16;
-                            }
+                            // else
+                            // {
+                            //     player.body.x=player.directions[1].pixelX+16;
+                            // }
                             
                         }
                         
@@ -856,10 +1416,10 @@ var Zerpentine = new Phaser.Class({
                                 player.body.x += player.speed;
                             }
                             //// if needed to reset body from wall
-                            else
-                            {
-                                player.body.x=player.directions[2].pixelX-16;
-                            }
+                            // else
+                            // {
+                            //     player.body.x=player.directions[2].pixelX-16;
+                            // }
                             
                         }
                                                 
@@ -876,10 +1436,10 @@ var Zerpentine = new Phaser.Class({
                                 player.body.y -= player.speed;
                             }
                             // if needed to reset body from wall
-                            else
-                            {
-                                player.body.y=player.directions[3].pixelY+16;
-                            }
+                            // else
+                            // {
+                            //     player.body.y=player.directions[3].pixelY+16;
+                            // }
                             
                         }
                         
@@ -896,10 +1456,10 @@ var Zerpentine = new Phaser.Class({
                                 player.body.y += player.speed;
                             }
                             // if needed to reset body from wall
-                            else
-                            {
-                                player.body.y=player.directions[4].pixelY-16;
-                            }
+                            // else
+                            // {
+                            //     player.body.y=player.directions[4].pixelY-16;
+                            // }
                             
                         }
                         
@@ -1007,6 +1567,7 @@ var Zerpentine = new Phaser.Class({
 
         
         //advance movement manually
+        var move_offset = enemy.type=='snake' ? 16:0;
         switch (enemy.current)
             {
                 case 1:
@@ -1016,15 +1577,17 @@ var Zerpentine = new Phaser.Class({
                         }
                         else
                         {
-                            if (enemy.body.x>enemy.directions[1].pixelX+16)
+                            if (enemy.body.x>enemy.directions[1].pixelX+move_offset)
                             {
                                 enemy.body.x -= enemy.speed;
                             }
 
-                            //// if needed to reset body from wall
+                            // if needed to reset body from wall
                             else
-                            {                   
-                                enemy.body.x=enemy.directions[1].pixelX+16;
+                            {   
+                                enemy.body.x=enemy.directions[1].pixelX+move_offset;
+                                //else enemy.current = this.opposites[enemy.current];               
+                                
                             }
                             
                         }
@@ -1037,15 +1600,15 @@ var Zerpentine = new Phaser.Class({
                         }
                         else
                         {
-                            if (enemy.body.x<enemy.directions[2].pixelX-16)
+                            if (enemy.body.x<enemy.directions[2].pixelX-move_offset)
                             {
                                 enemy.body.x += enemy.speed;
                             }
-                            //// if needed to reset body from wall
+                            // if needed to reset body from wall
                             else
                             {
-                                
-                                enemy.body.x=enemy.directions[2].pixelX-16;
+                                enemy.body.x=enemy.directions[2].pixelX-move_offset;
+                                //else enemy.current = this.opposites[enemy.current]; 
                             }
                             
                         }
@@ -1058,15 +1621,15 @@ var Zerpentine = new Phaser.Class({
                         }
                         else
                         {
-                            if (enemy.body.y>enemy.directions[3].pixelY+16)
+                            if (enemy.body.y>enemy.directions[3].pixelY+move_offset)
                             {
                                 enemy.body.y -= enemy.speed;
                             }
-                            //// if needed to reset body from wall
+                            // if needed to reset body from wall
                             else
                             {
-                                
-                                enemy.body.y=enemy.directions[3].pixelY+16;
+                                enemy.body.y=enemy.directions[3].pixelY+move_offset;
+                                //else enemy.current = this.opposites[enemy.current]; 
                             }
                             
                         }
@@ -1079,15 +1642,15 @@ var Zerpentine = new Phaser.Class({
                         }
                         else
                         {
-                            if (enemy.body.y<enemy.directions[4].pixelY-16)
+                            if (enemy.body.y<enemy.directions[4].pixelY-move_offset)
                             {
                                 enemy.body.y += enemy.speed;
                             }
-                            //// if needed to reset body from wall
+                            // if needed to reset body from wall
                             else
                             {
-
-                                enemy.body.y=enemy.directions[4].pixelY-16;
+                                enemy.body.y=enemy.directions[4].pixelY-move_offset;
+                                //else enemy.current = this.opposites[enemy.current]; 
                             }
                             
                         }
@@ -1096,28 +1659,31 @@ var Zerpentine = new Phaser.Class({
             }
 
         
-
-        var epart = enemy.snakePath[0];
-        
-        if ( !(epart.x==enemy.x && epart.y==enemy.y) )
+        if (enemy.type == 'snake')
         {
-            epart = enemy.snakePath.pop();
-
-            epart.x = enemy.x;
-            epart.y = enemy.y;
-            epart.angle = enemy.angle;
-
-
-
-            enemy.snakePath.unshift(epart);
-
-            for (var i = 1; i <= enemy.numSnakeSections; i++)
+            var epart = enemy.snakePath[0];
+        
+            if ( !(epart.x==enemy.x && epart.y==enemy.y) )
             {
-                enemy.snakeSection[i-1].x = (enemy.snakePath[i * enemy.snakeSpacer]).x;
-                enemy.snakeSection[i-1].y = (enemy.snakePath[i * enemy.snakeSpacer]).y;
-                enemy.snakeSection[i-1].angle = (enemy.snakePath[i * enemy.snakeSpacer]).angle;
-            }   
+                epart = enemy.snakePath.pop();
+
+                epart.x = enemy.x;
+                epart.y = enemy.y;
+                epart.angle = enemy.angle;
+
+
+
+                enemy.snakePath.unshift(epart);
+
+                for (var i = 1; i <= enemy.numSnakeSections; i++)
+                {
+                    enemy.snakeSection[i-1].x = (enemy.snakePath[i * enemy.snakeSpacer]).x;
+                    enemy.snakeSection[i-1].y = (enemy.snakePath[i * enemy.snakeSpacer]).y;
+                    enemy.snakeSection[i-1].angle = (enemy.snakePath[i * enemy.snakeSpacer]).angle;
+                }   
+            }
         }
+        
 
 
     },
@@ -1544,7 +2110,9 @@ var Zerpentine = new Phaser.Class({
             sprite.snakePath[i] = {x:0, y:0, angle:0};
         }
 
-        var thisSection = this.physics.add.sprite(24, 24, 'blue_section').setDepth(100-sprite.numSnakeSections);
+        var thisSection = this.physics.add.sprite(-100, -100, 'cyan_section').setDepth(100-sprite.numSnakeSections);
+
+        thisSection.type = 'normal';
 
         sprite.snakeSection.push(thisSection);         
 
@@ -1555,28 +2123,30 @@ var Zerpentine = new Phaser.Class({
     {
         for (var t=0;t<this.enemy_array.length;t++)
         {
-            if (this.enemy_array[t].numSnakeSections<vssprite.numSnakeSections)
-            {   
-                this.enemy_array[t].status = 'green';
-
-                this.enemy_array[t].setTexture('green_head');
-                for (var y=0;y<this.enemy_array[t].numSnakeSections;y++)
-                {
-                    this.enemy_array[t].snakeSection[y].setTexture('green_section'); 
-                }
-            }
-            
-            else
+            if (this.enemy_array[t].type=='snake')
             {
-                this.enemy_array[t].status = 'red';
+                if (this.enemy_array[t].numSnakeSections<vssprite.numSnakeSections)
+                {   
+                    this.enemy_array[t].status = 'green';
 
-                this.enemy_array[t].setTexture('red_head');
-                for (var y=0;y<this.enemy_array[t].numSnakeSections;y++)
-                {
-                    this.enemy_array[t].snakeSection[y].setTexture('red_section'); 
+                    this.enemy_array[t].setTexture('green_head');
+                    for (var y=0;y<this.enemy_array[t].numSnakeSections;y++)
+                    {
+                        this.enemy_array[t].snakeSection[y].setTexture('green_section'); 
+                    }
                 }
-            }
-            
+                
+                else
+                {
+                    this.enemy_array[t].status = 'red';
+
+                    this.enemy_array[t].setTexture('red_head');
+                    for (var y=0;y<this.enemy_array[t].numSnakeSections;y++)
+                    {
+                        this.enemy_array[t].snakeSection[y].setTexture('red_section'); 
+                    }
+                }
+            } 
         }
     },
 

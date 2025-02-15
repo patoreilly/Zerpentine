@@ -65,8 +65,11 @@ var Menus = new Phaser.Class({
 
 
         var menus = this.scene.get('menus');
+
+        
+
         //var title = this.scene.get('title');
-        //var holderimg = title.titlegen.displayimg;
+        
 
         
 
@@ -186,8 +189,10 @@ var Menus = new Phaser.Class({
 
             if (button.index==4)
             {
+                this.scene.setVisible(false, 'rulez');
+                this.scene.setVisible(false, 'bugz');
+                this.scene.setVisible(false, 'about');
                 this.displayHideMenu();
-                //this.scene.setVisible(false, 'about');
             }
             if (button.index==12)
             {
@@ -435,37 +440,51 @@ var Menus = new Phaser.Class({
             switch (selected_index)
             {
                 case 0:
+                    this.scene.setVisible(false, 'rulez');
+                    this.scene.setVisible(false, 'bugz');
+                    this.scene.setVisible(false, 'about');
                     this.displayHideMenu();
                     this.startNewGame();
                     break;
 
                 case 1:
-                    // menu1_cont.visible = false;
-                    // menu2_cont.visible = true;
-                    // this.current_menu = 1;
-                    // this.current_index = 0;
-                    // //if touch is not activated default hilight top menu item
-                    // if (!touchActivated)
-                    // {
-                    //     this.menu[1].buttons[0].setFont('Menu_Rollover');
-                    // }
-                    // //unhightlight all other items
-                    // for (var i=1; i<this.menu[1].items.length; i++)
-                    // {
-                    //     this.menu[1].buttons[i].setFont('Menu');
-                    // }
+                    if (!this.scene.isActive('rulez'))
+                    {
+                        this.scene.launch('rulez');
+                        this.scene.bringToTop('rulez');
+                    }
+                    else
+                    {
+                        this.scene.bringToTop('rulez');
+                        this.scene.setVisible(true, 'rulez');
+                    }
+                    
                     break;
 
                 case 2:
-                    // this.displayHideMenu();
-                    // this.startDemo();
+                    if (!this.scene.isActive('bugz'))
+                    {
+                        this.scene.launch('bugz');
+                        this.scene.bringToTop('bugz');
+                    }
+                    else
+                    {
+                        this.scene.bringToTop('bugz');
+                        this.scene.setVisible(true, 'bugz');
+                    }
                     break;
 
                 case 3:
-                    // this.displayHideMenu();
-                    // //this.scene.setActive(false, 'raycer');
-                    // this.scene.launch('about');
-
+                    if (!this.scene.isActive('about'))
+                    {
+                        this.scene.launch('about');
+                        this.scene.bringToTop('about');
+                    }
+                    else
+                    {
+                        this.scene.bringToTop('about');
+                        this.scene.setVisible(true, 'about');
+                    }
                     break;
 
 
@@ -540,6 +559,9 @@ var Menus = new Phaser.Class({
         
         if (Phaser.Input.Keyboard.JustDown(this.escape_key))
         {
+            this.scene.setVisible(false, 'rulez');
+            this.scene.setVisible(false, 'bugz');
+            this.scene.setVisible(false, 'about');
             this.displayHideMenu();
         }
 
@@ -616,7 +638,7 @@ var Menus = new Phaser.Class({
         //     'Playback Model: ' + SIDplayer.getmodel()
         // ]);
 
-        SIDplayer.start(0);
+        SIDplayer.start(3);
 
         
 

@@ -31,9 +31,15 @@ var Setup = new Phaser.Class({
         this.load.image('touch_icon', 'gui/touch_icon.png');
         this.load.image('gamepad_icon', 'gui/gamepad_icon.png');        
 
+        
+        
+
         // load spritesheets
+        this.load.spritesheet('purple_explosion', 'sprites/purple_explosion.png',{ frameWidth: 32, frameHeight: 32 });
+
+        this.load.spritesheet('sploder', 'sprites/sploder.png',{ frameWidth: 16, frameHeight: 16 }); // 6 frames
+
         this.load.spritesheet('atest', 'sprites/atest.png',{ frameWidth: 16, frameHeight: 16 }); // 8 frames
-        this.load.spritesheet('atest2', 'sprites/atest2.png',{ frameWidth: 16, frameHeight: 16 }); // 6 frames
         this.load.spritesheet('atest3', 'sprites/atest3.png',{ frameWidth: 32, frameHeight: 32 }); // 15 frames
         this.load.spritesheet('atest7', 'sprites/atest7.png',{ frameWidth: 28, frameHeight: 22 }); // 16 frames
         this.load.spritesheet('atest8', 'sprites/atest8.png',{ frameWidth: 28, frameHeight: 32 }); // 12 frames
@@ -53,8 +59,10 @@ var Setup = new Phaser.Class({
         this.load.image('green_section', 'sprites/green_section.png');
         this.load.spritesheet('green_pop', 'sprites/green_pop.png',{ frameWidth: 16, frameHeight: 16 });
 
-        this.load.image('blue_head', 'sprites/blue_head.png');
-        this.load.image('blue_section', 'sprites/blue_section.png');
+        this.load.image('cyan_head', 'sprites/cyan_head.png');
+        this.load.image('cyan_section', 'sprites/cyan_section.png');
+        this.load.spritesheet('cyan_pop', 'sprites/cyan_pop.png',{ frameWidth: 16, frameHeight: 16 });
+
         this.load.spritesheet('blue_pop', 'sprites/blue_pop.png',{ frameWidth: 16, frameHeight: 16 });
         
         
@@ -219,8 +227,24 @@ var Setup = new Phaser.Class({
         // this.load.spritesheet('atest14', 'sprites/atest14.png',{ frameWidth: 24, frameHeight: 17 }); // 8 frames
         // this.load.spritesheet('atest17', 'sprites/atest17.png',{ frameWidth: 17, frameHeight: 18 }); // 28 frames
         
+
+
         // pre-load animations used in other scenes
 
+        this.anims.create({
+                key: 'purple_explosion_animation',
+                frames: this.anims.generateFrameNumbers('purple_explosion'),
+                frameRate: 20,
+                repeat: 0
+            });
+
+        this.anims.create({
+                key: 'blue_pop_animation',
+                frames: this.anims.generateFrameNumbers('blue_pop'),
+                frameRate: 20,
+                repeat: 0
+                //yoyo: true
+            });
 
         this.anims.create({
                 key: 'green_pop_animation',
@@ -239,29 +263,27 @@ var Setup = new Phaser.Class({
             });
 
         this.anims.create({
-                key: 'blue_pop_animation',
-                frames: this.anims.generateFrameNumbers('blue_pop'),
+                key: 'cyan_pop_animation',
+                frames: this.anims.generateFrameNumbers('cyan_pop'),
                 frameRate: 20,
                 repeat: 0
                 //yoyo: true
             });
 
-
-
-
-
-
         this.anims.create({
-                key: 'atest_animation',
-                frames: this.anims.generateFrameNumbers('atest'),
+                key: 'sploder_animation',
+                frames: this.anims.generateFrameNumbers('sploder'),
                 frameRate: 20,
                 repeat: -1
                 //yoyo: true
             });
+
+
+
         
         this.anims.create({
-                key: 'atest2_animation',
-                frames: this.anims.generateFrameNumbers('atest2'),
+                key: 'spawnloop_animation',
+                frames: this.anims.generateFrameNumbers('atest3'),
                 frameRate: 20,
                 repeat: -1
                 //yoyo: true
@@ -271,25 +293,11 @@ var Setup = new Phaser.Class({
                 key: 'atest3_animation',
                 frames: this.anims.generateFrameNumbers('atest3'),
                 frameRate: 20,
-                repeat: -1
+                repeat: 0
                 //yoyo: true
             });
         
-        this.anims.create({
-                key: 'atest7_animation',
-                frames: this.anims.generateFrameNumbers('atest7'),
-                frameRate: 20,
-                repeat: -1
-                //yoyo: true
-            });
-        
-        this.anims.create({
-                key: 'atest8_animation',
-                frames: this.anims.generateFrameNumbers('atest8'),
-                frameRate: 20,
-                repeat: -1
-                //yoyo: true
-            });
+
         
         this.anims.create({
                 key: 'atest9_animation',
@@ -306,7 +314,7 @@ var Setup = new Phaser.Class({
                 repeat: -1
                 //yoyo: true
             });
-        
+
         this.anims.create({
                 key: 'atest11_animation',
                 frames: this.anims.generateFrameNumbers('atest11'),
@@ -315,29 +323,7 @@ var Setup = new Phaser.Class({
                 //yoyo: true
             });
         
-        this.anims.create({
-                key: 'atest12_animation',
-                frames: this.anims.generateFrameNumbers('atest12'),
-                frameRate: 20,
-                repeat: -1
-                //yoyo: true
-            });
         
-        this.anims.create({
-                key: 'atest14_animation',
-                frames: this.anims.generateFrameNumbers('atest14'),
-                frameRate: 20,
-                repeat: -1
-                //yoyo: true
-            });
-
-        this.anims.create({
-                key: 'atest17_animation',
-                frames: this.anims.generateFrameNumbers('atest17'),
-                frameRate: 20,
-                repeat: -1
-                //yoyo: true
-            });
         
         
 
