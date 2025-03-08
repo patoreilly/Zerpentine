@@ -31,7 +31,7 @@ var Zerpentine = new Phaser.Class({
         
         this_context = this;
 
-        
+        createSpriteSheetEmitter(this_context);
 
         //universal params
         this.mazeWidth = 19;
@@ -1017,6 +1017,12 @@ var Zerpentine = new Phaser.Class({
 
     do_skiller: function(sprite1, sprite2)
     {
+
+        myParticles.explode(500, sprite2.x, sprite2.y);
+        sprite2.destroy();
+
+        //this_context.time.addEvent({ delay: 100, callback: function(){myParticles.stop();}, callbackScope: this, repeat: 0 });
+
         for (var y=0;y<this_context.enemy_array.length;y++)
         {
             if (this_context.enemy_array[y].type == 'spider') 
@@ -2421,3 +2427,142 @@ var Zerpentine = new Phaser.Class({
 
 });
 
+function createSpriteSheetEmitter(thisContext)
+{
+    var tileSize = 2;
+
+    
+     
+
+
+    
+        var randomKey1 = Math.random().toString();
+        var canvasFrame = thisContext.textures.createCanvas(randomKey1, 6*tileSize, tileSize);
+
+
+
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['A'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,0,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(1, 0, 0, 0, tileSize, tileSize);
+
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['B'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,2,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(2, 0, 2, 0, tileSize, tileSize);
+
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['C'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,4,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(3, 0, 4, 0, tileSize, tileSize);
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['D'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,6,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(4, 0, 6, 0, tileSize, tileSize);
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['E'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,8,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(5, 0, 8, 0, tileSize, tileSize);
+
+        var randomKey = Math.random().toString();
+        thisContext.textures.generate(randomKey, { data: ['1'], pixelWidth: 2, palette: palette_cga});
+
+        //draw the texture data for this frame into the sprite sheet
+        canvasFrame.drawFrame(randomKey,0,10,0);
+        //add the frame data for this frame into the sprite sheet
+        canvasFrame.add(6, 0, 10, 0, tileSize, tileSize);
+
+
+
+
+        thisContext.add.image(0, 0, randomKey1, '__BASE').setOrigin(0).setScale(5);
+
+
+
+
+        myParticles = thisContext.add.particles(randomKey1).createEmitter({
+
+        defaultFrame: 1,
+        frames: [1,2,3,4,5,6],
+        x: 320,
+        y: 200,
+        frequency: -1,
+        angle: { min: 0, max: 360 },
+        speed: { min: 400, max: 660 },
+        // gravityY: -350,
+        lifespan: 2000,
+        quantity: 1,
+        scale: { min: 1.5, max: 3.5 },
+        active: true
+
+        });
+
+        myParticles.setFrame([1,2,3,4,5,6] , true );
+
+        //myParticles.stop();
+
+
+
+        // var emitter0 = thisContext.add.particles(randomKey1).createEmitter({
+        // x: -120,
+        // y: 30,
+        // //frequency: 160,
+
+        // quantity: 20,
+        // speedY: { min: 100, max: 300 },
+        // speedX: { min: -40, max: 40 },
+        // //angle: { min: 160, max: 200 },
+        // scale: { start: 1, end: 1 },
+        // blendMode: 'SCREEN',
+        // //active: false,
+        // lifespan: 600,
+        // gravityY: 150
+        // });
+        // emitter0.setFrame([6,4,3,5,1,2] , false, 800 );
+        // emitter0.startFollow(text);
+
+
+        // var emitter1 = thisContext.add.particles(randomKey1).createEmitter({
+        // x: 120,
+        // y: 30,
+        // //frequency: 160,
+
+        // quantity: 20,
+        // speedY: { min: 100, max: 300 },
+        // speedX: { min: -40, max: 40 },
+        // //angle: { min: 160, max: 200 },
+        // scale: { start: 1, end: 1 },
+        // blendMode: 'SCREEN',
+        // //active: false,
+        // lifespan: 600,
+        // gravityY: 150
+        // });
+        // emitter1.setFrame([6,4,3,5,1,2] , false, 800 );
+        // emitter1.startFollow(text);
+
+
+        // thisContext.time.addEvent({ delay: 8000, callback: function(){emitter0.stop();emitter1.stop();}, callbackScope: this, repeat: 0 });
+
+
+
+}
