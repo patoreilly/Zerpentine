@@ -4,7 +4,7 @@ var config = {
     width: 640,
     height: 400,
     //transparent: true,
-    backgroundColor: '#494561',
+    //backgroundColor: '#000000',
     roundPixels: true,
     pixelArt: true,
     physics: {

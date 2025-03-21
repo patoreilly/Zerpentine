@@ -21,12 +21,16 @@ var Zerpentine = new Phaser.Class({
         this.load.image('spider', 'sprites/spider.png');
         this.load.image('spider_violet', 'sprites/spider_violet.png');
         this.load.image('spideregg', 'sprites/spideregg.png');
-        this.load.image('mazetiles', 'sprites/mazetiles_v1.png');
+        this.load.image('mazetiles', 'sprites/mazetiles_v2.png');
+        this.load.image('sparticles', 'sprites/multiparticles.png');
 
     },
 
     create: function ()
     {   
+
+        // offset bgimg x value by -8 to compensate for camera centering for this scene -see camera settings
+        bgimg = this.add.image(-8,0,'chunk3').setAlpha(.25).setOrigin(0).setDisplaySize(640,400).setDepth(0);
         
         
         this_context = this;
@@ -43,7 +47,7 @@ var Zerpentine = new Phaser.Class({
         this.turnSpeed = 150;
         this.opposites = [ _NONE, _RIGHT, _LEFT, _DOWN, _UP ];
 
-        this.numEnemies = 6;
+        this.numEnemies = 4;
 
         this.player_dead = false;
 
@@ -249,7 +253,7 @@ var Zerpentine = new Phaser.Class({
         // init spideregg sprites
         this.spideregg_group = this.add.group();
 
-        for (var t=0;t<10;t++)
+        for (var t=0;t<4;t++)
         {
             var newPosition = this.getUnusedRandomMazePosition();
 
@@ -608,6 +612,7 @@ var Zerpentine = new Phaser.Class({
 
         myCam = this.cameras.main;
 
+        
 
 
         if (demo_mode)
@@ -1017,20 +1022,30 @@ var Zerpentine = new Phaser.Class({
 
     do_skiller: function(sprite1, sprite2)
     {
+        myParticles.setPosition(sprite2.x, sprite2.y);
+        myParticles.start();
+        myParticles.resume();
+        //myParticles.explode(100, sprite2.x, sprite2.y);
+        //sprite2.destroy();
 
-        myParticles.explode(500, sprite2.x, sprite2.y);
-        sprite2.destroy();
+        this_context.time.addEvent({ delay: 2000, callback: function(){myParticles.stop();}, callbackScope: this, repeat: 0 });
 
-        //this_context.time.addEvent({ delay: 100, callback: function(){myParticles.stop();}, callbackScope: this, repeat: 0 });
-
-        for (var y=0;y<this_context.enemy_array.length;y++)
+        for (let y=0;y<this_context.enemy_array.length;y++)
         {
             if (this_context.enemy_array[y].type == 'spider') 
-            { 
-                this_context.enemy_array[y].setTexture('spider_violet');
-                this_context.enemy_array[y].status = 'violet';
-            }
+            {
+                this_context.time.addEvent({ delay: 500, callback: function()
+                {
 
+                    if (this_context.enemy_array[y] != undefined)
+                    {
+                        this_context.enemy_array[y].setTexture('spider_violet');
+                        this_context.enemy_array[y].status = 'violet';
+                    }
+                    
+
+                }, callbackScope: this, repeat: 0 });
+            }
         }
     },
 
@@ -1173,6 +1188,9 @@ var Zerpentine = new Phaser.Class({
         thing.context.clearRect(0,0,thing.buffer.width,thing.buffer.height);
         thing.context.drawImage(thing.srcimg, 0,0,thing.srcimg.width,thing.srcimg.height,0,0,thing.buffer.width, thing.buffer.height);
         thing.buffer.refresh();
+
+        var r = Phaser.Math.Between(0,9);
+        bgimg.setTexture('chunk'+r);
     },
     
     update: function(time)
@@ -2429,95 +2447,106 @@ var Zerpentine = new Phaser.Class({
 
 function createSpriteSheetEmitter(thisContext)
 {
-    var tileSize = 2;
+    // var tileSize = 2;
 
     
      
 
 
     
+    //     var randomKey1 = Math.random().toString();
+    //     var canvasFrame = thisContext.textures.createCanvas(randomKey1, 6*tileSize, tileSize);
+
+
+
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['A'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,0,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(1, 0, 0, 0, tileSize, tileSize);
+
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['B'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,2,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(2, 0, 2, 0, tileSize, tileSize);
+
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['C'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,4,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(3, 0, 4, 0, tileSize, tileSize);
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['D'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,6,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(4, 0, 6, 0, tileSize, tileSize);
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['E'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,8,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(5, 0, 8, 0, tileSize, tileSize);
+
+    //     var randomKey = Math.random().toString();
+    //     thisContext.textures.generate(randomKey, { data: ['1'], pixelWidth: 2, palette: palette_cga});
+
+    //     //draw the texture data for this frame into the sprite sheet
+    //     canvasFrame.drawFrame(randomKey,0,10,0);
+    //     //add the frame data for this frame into the sprite sheet
+    //     canvasFrame.add(6, 0, 10, 0, tileSize, tileSize);
+
+
+
+
+    //     thisContext.add.image(0, 0, randomKey1, '__BASE').setOrigin(0).setScale(5);
         var randomKey1 = Math.random().toString();
-        var canvasFrame = thisContext.textures.createCanvas(randomKey1, 6*tileSize, tileSize);
+        var particleCanvas = thisContext.textures.createCanvas(randomKey1,592,74);
+        
 
+        particleCanvas.drawFrame('sparticles',0,0,0);
 
-
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['A'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,0,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(1, 0, 0, 0, tileSize, tileSize);
-
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['B'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,2,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(2, 0, 2, 0, tileSize, tileSize);
-
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['C'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,4,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(3, 0, 4, 0, tileSize, tileSize);
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['D'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,6,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(4, 0, 6, 0, tileSize, tileSize);
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['E'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,8,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(5, 0, 8, 0, tileSize, tileSize);
-
-        var randomKey = Math.random().toString();
-        thisContext.textures.generate(randomKey, { data: ['1'], pixelWidth: 2, palette: palette_cga});
-
-        //draw the texture data for this frame into the sprite sheet
-        canvasFrame.drawFrame(randomKey,0,10,0);
-        //add the frame data for this frame into the sprite sheet
-        canvasFrame.add(6, 0, 10, 0, tileSize, tileSize);
-
-
-
-
-        thisContext.add.image(0, 0, randomKey1, '__BASE').setOrigin(0).setScale(5);
-
-
+        
+        for (var f=0;f<8;f++)
+        {
+            particleCanvas.add(f, 0, f*74, 0, 74, 74);
+        }
 
 
         myParticles = thisContext.add.particles(randomKey1).createEmitter({
 
         defaultFrame: 1,
-        frames: [1,2,3,4,5,6],
+        frames: [0,1,2,3,4,5,6,7],
         x: 320,
         y: 200,
-        frequency: -1,
-        angle: { min: 0, max: 360 },
-        speed: { min: 400, max: 660 },
-        // gravityY: -350,
+        frequency: 100,
+        alpha: { start: .05, end: 0 },
+        angle: 0,//{ min: 0, max: 360 },
+        speed: 0,//{ min: 300, max: 600 },
+        //gravityY: 200,
         lifespan: 2000,
-        quantity: 1,
-        scale: { min: 1.5, max: 3.5 },
-        active: true
+        quantity: 6,
+        scale: { start: 1, end: 10 },
+        //rotate: { start: 0, end: 360 },
+        active: false
 
         });
 
-        myParticles.setFrame([1,2,3,4,5,6] , true );
+        myParticles.setFrame([0,1,2,3,4,5,6,7] , true );
 
         //myParticles.stop();
 

@@ -63,6 +63,8 @@ var Setup = new Phaser.Class({
         this.load.image('cyan_section', 'sprites/cyan_section.png');
         this.load.spritesheet('cyan_pop', 'sprites/cyan_pop.png',{ frameWidth: 16, frameHeight: 16 });
 
+        this.load.image('blue_head', 'sprites/blue_head.png');
+        this.load.image('blue_section', 'sprites/blue_section.png');
         this.load.spritesheet('blue_pop', 'sprites/blue_pop.png',{ frameWidth: 16, frameHeight: 16 });
         
         
@@ -193,7 +195,21 @@ var Setup = new Phaser.Class({
     {
 
         //create gui textures for use in all scenes
+        this.textures.generate('chunk0', { data: ['A'], pixelWidth: 1});
+        this.textures.generate('chunk1', { data: ['B'], pixelWidth: 1});
+        this.textures.generate('chunk2', { data: ['C'], pixelWidth: 1});
         this.textures.generate('chunk3', { data: ['D'], pixelWidth: 1});
+        this.textures.generate('chunk4', { data: ['E'], pixelWidth: 1});
+        this.textures.generate('chunk5', { data: ['F'], pixelWidth: 1});
+        this.textures.generate('chunk6', { data: ['1'], pixelWidth: 1});
+        this.textures.generate('chunk7', { data: ['2'], pixelWidth: 1});
+        this.textures.generate('chunk8', { data: ['3'], pixelWidth: 1});
+        this.textures.generate('chunk9', { data: ['4'], pixelWidth: 1});
+        
+
+
+
+
         this.textures.generate('a_menu', { data: accessMenuData, pixelWidth: 1});
 
         /// debug global
